@@ -64,7 +64,7 @@
     server.servlet.context-path=/crud
     访问地址就需要http://localhost:8080/crud/,就是启动路径
     
-###国际化配置
+### 国际化配置
 
     1.springboot国际化非常简单，只需要配置国际化文件，例如login页面国际化
     创建3个login.properties，login_en_US.properties，login_zh_CN.properties文件然后打开
@@ -141,8 +141,103 @@
     所以如果公用页面时候需要单独使用post提交时候一定要去掉<input type="hidden" name="_method" value="put"/>
     否则回报405错
     
-    
-     
-     
-     
-     
+### 注册三大组件（Servlet，Filter，Listener）用以下方式
+
+    Servlet:
+        1.创建一个MyServlet类，继承HttpServlet,重写doGet和doPost方法
+        2.在Configuration的配置类MyServerConfig中注册MyServlet类,设置访问路径即可
+        
+        MyServlet代码:
+            public class MyServlet extends HttpServlet {
+            
+                @Override
+                protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                    this.doPost(req,resp);
+                }
+            
+                @Override
+                protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                    System.out.println("hello servlet");
+                }
+            }
+        
+        MyServerConfig代码：
+            @Configuration
+            public class MyServerConfig implements WebMvcConfigurer {
+            
+                /**
+                 * 注册servlet
+                 * @return
+                 */
+                @Bean
+                public ServletRegistrationBean myServlet() {
+                    ServletRegistrationBean servletRegistrationBean = new ServletRegistrationBean(new MyServlet(), "/myServlet");
+                    servletRegistrationBean.setLoadOnStartup(1);
+                    return servletRegistrationBean;
+                }
+            }
+    Filter：
+        同Serlvet注册一样.
+        1.创建一个MyFilter类，实现Filter,重写init和doFilter以及destroy方法
+        2.在Configuration的配置类MyServerConfig中注册MyFilter类,设置拦截请求路径即可
+        MyFilter代码（一定要实现javax.servlet的Filter接口）：
+            public class MyFilter implements Filter {
+            
+                @Override
+                public void init(FilterConfig filterConfig) throws ServletException {
+            
+                }
+            
+                @Override
+                public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+                    System.out.println("MyFilter process...");
+                    //放行
+                    chain.doFilter(request,response);
+                }
+            
+                @Override
+                public void destroy() {
+            
+                }
+            }
+        MyServerConfig代码：
+            /**
+             * 注册拦截器
+             * @return
+             */
+            @Bean
+            public FilterRegistrationBean myFilter() {
+                FilterRegistrationBean<Filter> filterFilterRegistrationBean = new FilterRegistrationBean<>();
+                filterFilterRegistrationBean.setFilter(new MyFilter());
+                //要拦截的请求
+                filterFilterRegistrationBean.setUrlPatterns(Arrays.asList("/myServlet"));
+                return filterFilterRegistrationBean;
+            }
+    Listener：
+        同Serlvet注册一样.
+        1.创建一个MyListener类，实现ServletContextListener,重写contextInitialized和contextDestroyed，开始和销毁方法
+        2.在Configuration的配置类MyServerConfig中注册MyListener类即可
+        MyListener代码:
+            public class MyListener implements ServletContextListener {
+                @Override
+                public void contextInitialized(ServletContextEvent sce) {
+                    System.out.println("contextInitialized...web应用启动");
+                }
+            
+                @Override
+                public void contextDestroyed(ServletContextEvent sce) {
+                    System.out.println("contextDestroyed...当前web项目销毁");
+                }
+            }
+        MyServerConfig代码：   
+            /**
+              * 注册监听器
+              * @return
+              */
+             @Bean
+             public ServletListenerRegistrationBean myListener(){
+                 ServletListenerRegistrationBean<MyListener> registrationBean = new ServletListenerRegistrationBean<>(new MyListener());
+                 return registrationBean;
+             }
+             
+           
