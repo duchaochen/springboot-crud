@@ -1,3 +1,7 @@
+### 日期格式化
+    配置文件下输入以下配置
+    spring.mvc.date-format=yyyy-MM-dd HH:mm:ss
+
 ### 引入静态资源方式，类路径的设置
 
      都是以webjars方式引入,官网：https://www.webjars.org/
@@ -27,7 +31,7 @@
      注意：还可以自定义类路径：
      spring.resources.static-locations=classpath:/hello/,classpath:/adu/
      
-### thymeleaf导入
+### 使用thymeleaf模版引擎必须导入spring-boot-starter-thymeleaf启动器
 
     加入thymeleaf启动器
      <dependency>
@@ -49,6 +53,11 @@
             };
         }
     }
+    
+### 禁用idea的thymeleaf缓存
+
+    1.在配置文件中写入如下代码：spring.thymeleaf.cache=false
+    2.按住ctrl+F9编译一下idea文件，再刷新页面就会没有缓存了
     
 ### 项目访问路径设置
 
@@ -113,4 +122,27 @@
         public LocaleResolver localeResolver() {
             return new MyLocaleResolver();
         }
+###springboot页面重定向
+
+    在配置类中添加一个要重定向的视图解析器
+    代码：
+        registry.addViewController("/main.html").setViewName("dashboard");
+    然后在要重定向的地方输入如下代码：
+     return "redirect:/main.html";
+
+### PUT,DELETE提交
+
+    1、SpringMVC中配置HiddenHttpMethodFilter;（SpringBoot自动配置好的）
+    2、页面创建一个post表单
+    3、创建一个input项，name="_method";值就是我们指定的请求方式
+    4、添加<input type="hidden" name="_method" value="put"/>就成为了put提交方式了,value=delete表示delete提交
     
+    注意：以上加了_method之后，springboot都会自动配置的，
+    所以如果公用页面时候需要单独使用post提交时候一定要去掉<input type="hidden" name="_method" value="put"/>
+    否则回报405错
+    
+    
+     
+     
+     
+     

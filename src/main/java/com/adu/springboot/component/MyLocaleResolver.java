@@ -8,6 +8,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Locale;
 
+/**
+ * 国际化
+ */
 public class MyLocaleResolver implements LocaleResolver {
     /**
      * 解析区域信息
