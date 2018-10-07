@@ -240,4 +240,40 @@
                  return registrationBean;
              }
              
-           
+### springboot嵌入jsp
+
+    外置的Servlet容器：外面安装Tomcat---应用war包的方式打包；
+    
+    ### 步骤
+    
+    1）、必须创建一个war项目；（利用idea创建好目录结构）
+    
+    2）、将嵌入式的Tomcat指定为provided；
+    
+    <dependency>
+       <groupId>org.springframework.boot</groupId>
+       <artifactId>spring-boot-starter-tomcat</artifactId>
+       <scope>provided</scope>
+    </dependency>
+    
+    3）、必须编写一个**SpringBootServletInitializer**的子类，并调用configure方法
+    
+    public class ServletInitializer extends SpringBootServletInitializer {
+    
+       @Override
+       protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+           //传入SpringBoot应用的主程序
+          return application.sources(SpringBoot04WebJspApplication.class);
+       }
+    
+    }
+    
+    4）、启动服务器就可以使用；
+    
+    ### 原理
+    
+    jar包：执行SpringBoot主类的main方法，启动ioc容器，创建嵌入式的Servlet容器；
+    
+    war包：启动服务器，服务器启动SpringBoot应用【SpringBootServletInitializer】，启动ioc容器；
+    
+      
